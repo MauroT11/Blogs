@@ -1,6 +1,7 @@
 import { Inter, Exo_2 } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/Header";
+import Footer from "@/component/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 const exo = Exo_2({ subsets: ["latin"] });
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
       <body className={exo.className}>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
