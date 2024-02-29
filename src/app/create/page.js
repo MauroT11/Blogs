@@ -12,15 +12,15 @@ export default async function page() {
 
         console.log(formData)
         const title = formData.get('title')
-        const artist = formData.get('artists')
+        const artist = formData.get('artist')
         const image = formData.get('image')
         const genre = formData.get('genre')
 
-        // await sql`INSERT INTO albums (Name, Author) VALUES (${title}, ${author})`
+        await sql`INSERT INTO albumRevs (title, artist, image, genre) VALUES (${title}, ${artist}, ${image}, ${genre})`
 
-        // revalidatePath('/about')
+        revalidatePath('/albums')
 
-        // redirect('/about')
+        redirect('/albums')
     }
 
     return (
