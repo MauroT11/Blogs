@@ -40,8 +40,34 @@ export default async function page({params}) {
         redirect(`/albums/${params.id}`)
     }
 
+    async function handleDelete() {
+        'use server'
+
+        await sql`delete from comments where albumid = ${params.id}`
+        await sql`delete from albumrevs where id = ${params.id}`
+        
+
+        revalidatePath(`/albums/`)
+
+        redirect(`/albums/`)
+    }
+
+    async function handleCommentDelete() {
+        'use server'
+        console.log('delete')
+        // await sql`delete from comments where albumid = ${params.id}`
+        // await sql`delete from albumrevs where id = ${params.id}`
+        
+
+        // revalidatePath(`/albums/`)
+
+        // redirect(`/albums/`)
+    }
+
     return (
         <main className="flex flex-col items-center mt-8 justify-evenly">
+
+
             <div className="flex items-center justify-evenly min-w-full">
             {post.map((db) => (
                 <div key={db.id} className="flex flex-col items-center min-w-56 justify-center">
@@ -49,11 +75,18 @@ export default async function page({params}) {
                     <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
                     
                     <h3 className="text-2xl">{db.artist}</h3>
-                    <h3 className="text-lg">{db.genre}</h3>
-                    <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
+                    <h3 className="text-lg my-1">{db.genre}</h3>
+                    <div className="flex gap-4">
+                        <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
+                        <form action={handleDelete}>
+                            <button className="bg-red-600 text-white py-1 px-2 rounded border-black border-[2px]">Delete</button>
+                        </form>
+                    </div>
                 </div>
             ))}
-            <div className="grid-rows-1 flex-col gap-2 min-w-52 items-center">
+
+
+            <div className="grid-rows-2 flex-col gap-2 min-w-52 ">
                 {/* COMMNET SECTION  */}
                 {comments.map((comment) => (
                     <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
@@ -64,12 +97,19 @@ export default async function page({params}) {
                         <div>
                             <p className="text-xs">{comment.date}</p>
                         </div>
-                        
+                        <div className="flex gap-2">
+                            <Link href={`/albums/${params.id}/comments/${comment.id}/edit`} className="bg-blue-700 text-xs text-white px-2 rounded border-black border-[2px]">Edit</Link>
+                            <form action={handleCommentDelete}>
+                                <button className="bg-red-600 text-white text-xs px-2 rounded border-black border-[2px]">Delete</button>
+                            </form>                        
+                        </div>
                     </div>
                 ))}
             </div>
             </div>
             {/* ADD COMMENT */}
+
+
             <div className="absolute bg-white bottom-16 z-10 mb-3 flex flex-col items-center mt-4 border-zinc-400 border-[2px] rounded-xl p-4 text-center">
                 {/* <h1 className="text-lg">Leave a comment</h1> */}
                 <form className="flex place-content-evenly gap-3 items-center justify-center" action={handleComment}>
@@ -88,6 +128,8 @@ export default async function page({params}) {
                     <Submit />
                 </form>
             </div>
+
+
         </main>
     )
 }
