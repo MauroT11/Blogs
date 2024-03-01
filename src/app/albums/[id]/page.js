@@ -3,11 +3,22 @@ import Image from "next/image"
 import Submit from "@/component/Submit"
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import Link from "next/link";
+
+export async function generateMetadata({params}) {
+    
+    const album = (await sql`select * from albumrevs where id = ${params.id}`).rows
+    // console.log(album)
+    return {
+        title: `Track Gallery - ${album[0].title} by ${album[0].artist}`,
+        description: `All of the albums added by users.`
+    }
+  }
 
 export default async function page({params}) {
     
     const post = (await sql`select * from albumrevs where id = ${params.id}`).rows
-    // console.log(post)
+    // console.log(params)
     const comments = (await sql`select * from comments where albumid = ${params.id}`).rows
     // console.log(comments)
 
@@ -20,7 +31,7 @@ export default async function page({params}) {
 
         const date = `${submitDate.getUTCDate()}/${(submitDate.getUTCMonth() + 1)}/${submitDate.getUTCFullYear()} ${submitDate.getUTCHours()}:${submitDate.getMinutes()}`
 
-        console.log(comment, rate, date)
+        // console.log(comment, rate, date)
 
         await sql`INSERT INTO comments (content, rate, date, albumid) VALUES (${comment}, ${rate}, ${date}, ${params.id})`
 
@@ -30,23 +41,36 @@ export default async function page({params}) {
     }
 
     return (
-        <main className="flex flex-col items-center mt-1">
+        <main className="flex flex-col items-center mt-8 justify-evenly">
+            <div className="flex items-center justify-evenly min-w-full">
             {post.map((db) => (
-                <div key={db.id} className="flex flex-col items-center">
-                    <h1 className="text-4xl font-bold">{db.title}</h1>
-                    <Image src={db.image} width={300} height={300} alt="Album Image" className="my-2 rounded-lg"/>
+                <div key={db.id} className="flex flex-col items-center min-w-56 justify-center">
+                    <h1 className="text-5xl font-bold">{db.title}</h1>
+                    <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
+                    
                     <h3 className="text-2xl">{db.artist}</h3>
-                    <h3>{db.genre}</h3>
+                    <h3 className="text-lg">{db.genre}</h3>
+                    <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
                 </div>
             ))}
-            {comments.map((comment) => (
-                <div key={comment.id} className="flex flex-col items-center">
-                    <p>{comment.content}</p>
-                    <p>{comment.rate} 🌟</p>
-                    <p>{comment.date}</p>
-                </div>
-            ))}
-            <div className="absolute bottom-14 mb-3 flex flex-col items-center mt-4 border-zinc-400 border-[2px] rounded-xl p-4 text-center">
+            <div className="grid-rows-1 flex-col gap-2 min-w-52 items-center">
+                {/* COMMNET SECTION  */}
+                {comments.map((comment) => (
+                    <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
+                        <div className="flex flex-col items-center">
+                            <p className="text-lg">{comment.content}</p>
+                            <p>{comment.rate} 🌟</p>
+                        </div>
+                        <div>
+                            <p className="text-xs">{comment.date}</p>
+                        </div>
+                        
+                    </div>
+                ))}
+            </div>
+            </div>
+            {/* ADD COMMENT */}
+            <div className="absolute bg-white bottom-16 z-10 mb-3 flex flex-col items-center mt-4 border-zinc-400 border-[2px] rounded-xl p-4 text-center">
                 {/* <h1 className="text-lg">Leave a comment</h1> */}
                 <form className="flex place-content-evenly gap-3 items-center justify-center" action={handleComment}>
                     <div className="flex justify-center">

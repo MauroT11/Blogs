@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 const exo = Exo_2({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Blogs",
+  title: "Track Gallery",
   description: "Website blogs and comments",
 };
 
