@@ -5,7 +5,6 @@ import Image from "next/image"
 export async function generateMetadata({params}) {
 
     const genres = (await sql`select * from genres where id = ${params.id}`).rows
-    console.log(genres)
     return {
         title: `Albums -  ${genres[0].name}`,
         description: `${genres[0].name} Albums`
@@ -13,10 +12,12 @@ export async function generateMetadata({params}) {
   }
 
 export default async function page({params}) {
-
-    const posts = (await sql`select * from albumrevs where id = ${params.id}`).rows
     const genres = (await sql`select * from genres where id = ${params.id}`).rows
-    // console.log(genres)
+    const name = genres[0].name
+    console.log(name)
+    const posts = (await sql`select * from albumrevs where genre = ${name}`).rows
+    
+    console.log(posts)
     
 
     return (

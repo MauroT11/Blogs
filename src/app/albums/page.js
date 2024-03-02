@@ -5,7 +5,7 @@ import Filter from "@/component/Filter"
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-export async function generateMetadata({params}) {
+export async function generateMetadata() {
     return {
         title: `Track Gallery - Albums`,
         description: `This page has a list of posts`
@@ -30,7 +30,7 @@ export default async function page() {
     }
 
     return (
-        <main className="flex flex-col items-center justify-between mt-1">
+        <main className="flex flex-col items-center justify-between">
             <h1 className="text-3xl">Albums</h1>
             <form action={handleFilter}>
                 <div className="flex gap-2 justify-center mt-2">
@@ -44,7 +44,7 @@ export default async function page() {
                 </div>
             </form>
             
-            <div className="flex gap-4">
+            <div className="flex gap-2 flex-wrap justify-center">
                 {posts.map((post) => (
                     <div key={post.id} className="border-2 bg-indigo-100 p-4 flex flex-col mt-3 items-center rounded-xl border-zinc-400">
                         <h3 className="text-lg font-bold">{post.title}</h3>

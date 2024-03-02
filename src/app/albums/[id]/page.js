@@ -20,7 +20,7 @@ export default async function page({params}) {
     const post = (await sql`select * from albumrevs where id = ${params.id}`).rows
     // console.log(params)
     const comments = (await sql`select * from comments where albumid = ${params.id}`).rows
-    // console.log(comments)
+    console.log(comments)
 
     async function handleComment(formData) {
         'use server'
@@ -71,7 +71,7 @@ export default async function page({params}) {
             <div className="flex items-center justify-evenly min-w-full">
             {post.map((db) => (
                 <div key={db.id} className="flex flex-col items-center min-w-56 justify-center">
-                    <h1 className="text-5xl font-bold">{db.title}</h1>
+                    <h1 className="text-4xl font-bold">{db.title}</h1>
                     <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
                     
                     <h3 className="text-2xl">{db.artist}</h3>
@@ -85,9 +85,10 @@ export default async function page({params}) {
                 </div>
             ))}
 
-
-            <div className="grid-rows-2 flex-col gap-2 min-w-52 ">
-                {/* COMMNET SECTION  */}
+            {/* COMMENT SECTION  */}
+            <div className="flex flex-col items-center">
+                <h1 className="text-2xl font-bold">Comments</h1>
+            <div className="grid-rows-2 flex-col gap-2 min-w-52">
                 {comments.map((comment) => (
                     <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
                         <div className="flex flex-col items-center">
@@ -105,6 +106,7 @@ export default async function page({params}) {
                         </div>
                     </div>
                 ))}
+            </div>
             </div>
             </div>
             {/* ADD COMMENT */}
