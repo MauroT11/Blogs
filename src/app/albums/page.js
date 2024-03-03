@@ -12,7 +12,7 @@ export async function generateMetadata() {
     }
   }
 
-export default async function page() {
+export default async function page({params, searchParams}) {
 
     const posts = (await sql`select * from albumRevs`).rows
     
@@ -29,6 +29,10 @@ export default async function page() {
         redirect(`/genres/${genre}`)
     }
 
+    if (searchParams.sort === "desc") {
+        posts.reverse();
+    }
+
     return (
         <main className="flex flex-col items-center justify-between">
             <h1 className="text-3xl">Albums</h1>
@@ -43,7 +47,13 @@ export default async function page() {
                         <Filter />
                 </div>
             </form>
-            
+
+            <div className="flex gap-3">
+              <Link href={`/albums?sort=asc`}>Sort ascending</Link> - <Link href={`/albums?sort=desc`}>
+                      Sort descending
+                    </Link>
+            </div>
+
             <div className="flex gap-2 flex-wrap justify-center">
                 {posts.map((post) => (
                     <div key={post.id} className="border-2 bg-indigo-100 p-4 flex flex-col mt-3 items-center rounded-xl border-zinc-400">
