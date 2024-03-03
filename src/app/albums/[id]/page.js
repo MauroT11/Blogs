@@ -4,6 +4,8 @@ import Submit from "@/component/Submit"
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import AnimateIn from "@/component/AnimateIn";
+import AnimateImg from "@/component/AnimateImg";
 
 export async function generateMetadata({params}) {
     
@@ -67,13 +69,15 @@ export default async function page({params}) {
     return (
         <main className="flex flex-col items-center mt-8 justify-evenly">
 
-
+        
             <div className="flex items-center justify-evenly min-w-full">
+            <AnimateIn>    
             {post.map((db) => (
                 <div key={db.id} className="flex flex-col items-center min-w-56 justify-center">
                     <h1 className="text-4xl font-bold">{db.title}</h1>
-                    <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
-                    
+                    <AnimateImg>
+                        <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
+                    </AnimateImg>
                     <h3 className="text-2xl">{db.artist}</h3>
                     <h3 className="text-lg my-1">{db.genre}</h3>
                     <div className="flex gap-4">
@@ -84,7 +88,7 @@ export default async function page({params}) {
                     </div>
                 </div>
             ))}
-
+        </AnimateIn>
             {/* COMMENT SECTION  */}
             <div className="flex flex-col items-center">
                 <h1 className="text-2xl font-bold">Comments</h1>
