@@ -1,28 +1,35 @@
-import AnimateImg from "./AnimateImg"
+import PopHeader from "@/component/PopHeader"
+import { UserButton, SignInButton  } from "@clerk/nextjs";
+import Link from "next/link";
+import Image from "next/image";
 
-export default function Header() {
+export default function Header({ username, userId }) {
 
     return (
-        <header className="sticky flex flex-col items-center text-white bg-blue-700 p-1 border-zinc-400 border-b-[5px]">
-            <AnimateImg>
-                <h1 className="text-4xl font-bold">Track Gallery</h1>
-            </AnimateImg>
+        <header className="sticky flex justify-around items-center text-white bg-blue-700 py-2 border-zinc-400 border-b-[5px]">
+            <PopHeader>
+                <Link href="/" className="text-4xl font-bold">Track Gallery</Link>
+            </PopHeader>
             
             <nav>
-                <ul className="flex flex-row gap-8 p-2 text-lg">
-                    <AnimateImg>
-                        <li><a href="/" className="hover:underline">Home</a></li>
-                    </AnimateImg>
-                    <AnimateImg>
-                        <li><a href="/albums" className="hover:underline">Albums</a></li>
-                    </AnimateImg>
-                    <AnimateImg>
-                        <li><a href="/createA" className="hover:underline">Add Album</a></li>
-                    </AnimateImg>
-                    <AnimateImg>
-                        <li><a href="/createG" className="hover:underline">Add Genre</a></li>
-                    </AnimateImg>
-                    
+                <ul className="flex flex-row gap-8 p-2 text-3xl">
+                    <PopHeader>
+                        <li><a href="/albums">Albums</a></li>
+                    </PopHeader>
+                    <PopHeader>
+                        <li><a href="/add">Add</a></li>
+                    </PopHeader>
+                    {userId ? (
+                    <UserButton
+                        userProfileMode="navigation"
+                        userProfileUrl={`/userProfile/${username}`}
+                        afterSignOutUrl="/"
+                        />
+                    ) : (
+                        <PopHeader>
+                            <Link href={`/signIn`} state={userId}>Sign In</Link>
+                        </PopHeader>
+                    )}
                 </ul>
             </nav>
         </header>

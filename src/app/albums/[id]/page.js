@@ -22,7 +22,7 @@ export default async function page({params}) {
     const post = (await sql`select * from albumrevs where id = ${params.id}`).rows
     // console.log(params)
     const comments = (await sql`select * from comments where albumid = ${params.id}`).rows
-    console.log(comments)
+    // console.log(comments)
 
     async function handleComment(formData) {
         'use server'
@@ -73,13 +73,16 @@ export default async function page({params}) {
             <div className="flex items-center justify-evenly min-w-full">
             <AnimateIn>    
             {post.map((db) => (
-                <div key={db.id} className="flex flex-col items-center min-w-56 justify-center">
+                <div key={db.id} className="flex flex-col items-center min-w-56 justify-center gap-4">
                     <h1 className="text-4xl font-bold">{db.title}</h1>
                     <AnimateImg>
                         <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
                     </AnimateImg>
-                    <h3 className="text-2xl">{db.artist}</h3>
-                    <h3 className="text-lg my-1">{db.genre}</h3>
+                    <div className="flex flex-col gap-2 items-center">
+                        <h3 className="text-2xl">{db.artist}</h3>
+                        <h3 className="text-lg my-1">{db.genre}</h3>
+                        <p>Added by: <Link href={`/profile/${db.username}`}>{db.username}</Link></p>
+                    </div>
                     <div className="flex gap-4">
                         <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
                         <form action={handleDelete}>
