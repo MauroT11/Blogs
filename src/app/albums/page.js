@@ -26,7 +26,6 @@ export default async function page({params, searchParams}) {
 
         const genre = formData.get('genre')
 
-
         revalidatePath(`/genres/${genre}`)
 
         redirect(`/genres/${genre}`)
@@ -38,6 +37,7 @@ export default async function page({params, searchParams}) {
 
     return (
         <main className="flex flex-col items-center justify-between mb-24">
+            <h1 className="text-3xl font-bold mt-4">All Albums</h1>
             <form action={handleFilter}>
                 <div className="flex gap-2 justify-center my-4 items-center">
                         <label htmlFor="genre" className="text-lg">Genres:</label>

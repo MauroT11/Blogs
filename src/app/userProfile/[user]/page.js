@@ -11,7 +11,7 @@ export default async function Page({params}) {
     // console.log(userInfo)
 
     return (
-        <main className="flex flex-col items-center justify-between gap-4 py-8 ">
+        <main className="flex flex-col items-center justify-between gap-4 py-8">
             {userInfo.map((info) => (
                 <div key={info.id} className="flex flex-col gap-4 items-center">
                     <h1 className="text-4xl font-bold">{info.username}</h1>

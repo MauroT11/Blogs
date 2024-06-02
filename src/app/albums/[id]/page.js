@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import AnimateIn from "@/component/AnimateIn";
 import AnimateImg from "@/component/AnimateImg";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function generateMetadata({params}) {
     
@@ -18,11 +19,14 @@ export async function generateMetadata({params}) {
   }
 
 export default async function page({params}) {
+
+    const user = await currentUser();
+    const username = user?.username;
     
     const post = (await sql`select * from albumrevs where id = ${params.id}`).rows
-    // console.log(params)
+    // console.log(username)
     const comments = (await sql`select * from comments where albumid = ${params.id}`).rows
-    // console.log(comments)
+    
 
     async function handleComment(formData) {
         'use server'
@@ -35,7 +39,7 @@ export default async function page({params}) {
 
         // console.log(comment, rate, date)
 
-        await sql`INSERT INTO comments (content, rate, date, albumid) VALUES (${comment}, ${rate}, ${date}, ${params.id})`
+        await sql`INSERT INTO comments (content, rate, date, albumid, username) VALUES (${comment}, ${rate}, ${date}, ${params.id}, ${username})`
 
         revalidatePath(`/albums/${params.id}`)
 
@@ -67,78 +71,89 @@ export default async function page({params}) {
     }
 
     return (
-        <main className="flex flex-col items-center mt-8 justify-evenly">
-
-        
-            <div className="flex items-center justify-evenly min-w-full">
-            <AnimateIn>    
-            {post.map((db) => (
-                <div key={db.id} className="flex flex-col items-center min-w-56 justify-center gap-4">
-                    <h1 className="text-4xl font-bold">{db.title}</h1>
-                    <AnimateImg>
-                        <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
-                    </AnimateImg>
-                    <div className="flex flex-col gap-2 items-center">
-                        <h3 className="text-2xl">{db.artist}</h3>
-                        <h3 className="text-lg my-1">{db.genre}</h3>
-                        <p>Added by: <Link href={`/profile/${db.username}`}>{db.username}</Link></p>
-                    </div>
-                    <div className="flex gap-4">
-                        <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
-                        <form action={handleDelete}>
-                            <button className="bg-red-600 text-white py-1 px-2 rounded border-black border-[2px]">Delete</button>
-                        </form>
+        <main className="flex flex-col items-center mt-8 justify-around">
+            <div className="grid grid-cols-3">
+                <div className="col-span-1">
+                    <AnimateIn>    
+                    {post.map((db) => (
+                        <div key={db.id} className="flex flex-col items-center min-w-56 justify-center gap-4">
+                            <h1 className="text-4xl font-bold">{db.title}</h1>
+                            <AnimateImg>
+                                <Image src={db.image} width={350} height={400} alt="Album Image" className="my-2 rounded-lg"/>
+                            </AnimateImg>
+                            <div className="flex flex-col gap-2 items-center">
+                                <h3 className="text-2xl">{db.artist}</h3>
+                                <h3 className="text-lg">{db.genre}</h3>
+                                <p>Added by: <Link href={`/profile/${db.username}`}>{db.username}</Link></p>
+                            </div>
+                            {(username == db.username) ? (
+                                <div className="flex gap-4">
+                                    <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white py-1 px-4 rounded border-black border-[2px]">Edit</Link>
+                                    <form action={handleDelete}>
+                                        <button className="bg-red-600 text-white py-1 px-2 rounded border-black border-[2px]">Delete</button>
+                                    </form>
+                                </div>
+                            ) : (
+                                <></>
+                            )}
+                            
+                        </div>
+                    ))}
+                    </AnimateIn>
+                </div>    
+            {/* COMMENT SECTION  */}
+            <div className="col-span-2 justify-items-center">
+                <div className="flex flex-col items-center">
+                    <h1 className="text-2xl font-bold">Comments</h1>
+                    <div className="grid-rows-2 flex-col gap-2 min-w-[250px]">
+                        {comments.map((comment) => (
+                            <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
+                                <div className="flex flex-col items-center">
+                                    <p className="text-lg">{comment.content}</p>
+                                    <p>{comment.rate} 🌟</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm">{comment.date}</p>
+                                </div>
+                                {(username == comment.username) ? (
+                                    <div className="flex gap-2">
+                                        <Link href={`/albums/${params.id}/comments/${comment.id}/edit`} className="bg-blue-700 text-xs text-white px-2 rounded border-black border-[2px]">Edit</Link>
+                                        <form action={handleCommentDelete}>
+                                            <button className="bg-red-600 text-white text-xs px-2 rounded border-black border-[2px]">Delete</button>
+                                        </form>                        
+                                    </div>
+                                ) : (
+                                    <p>{comment.username}</p>
+                                )}
+                                
+                            </div>
+                        ))}
                     </div>
                 </div>
-            ))}
-        </AnimateIn>
-            {/* COMMENT SECTION  */}
-            <div className="flex flex-col items-center">
-                <h1 className="text-2xl font-bold">Comments</h1>
-            <div className="grid-rows-2 flex-col gap-2 min-w-52">
-                {comments.map((comment) => (
-                    <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
-                        <div className="flex flex-col items-center">
-                            <p className="text-lg">{comment.content}</p>
-                            <p>{comment.rate} 🌟</p>
-                        </div>
-                        <div>
-                            <p className="text-xs">{comment.date}</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <Link href={`/albums/${params.id}/comments/${comment.id}/edit`} className="bg-blue-700 text-xs text-white px-2 rounded border-black border-[2px]">Edit</Link>
-                            <form action={handleCommentDelete}>
-                                <button className="bg-red-600 text-white text-xs px-2 rounded border-black border-[2px]">Delete</button>
-                            </form>                        
-                        </div>
-                    </div>
-                ))}
-            </div>
-            </div>
             </div>
             {/* ADD COMMENT */}
 
 
-            <div className="absolute bg-white bottom-16 z-10 mb-3 flex flex-col items-center mt-4 border-zinc-400 border-[2px] rounded-xl p-4 text-center">
-                {/* <h1 className="text-lg">Leave a comment</h1> */}
-                <form className="flex place-content-evenly gap-3 items-center justify-center" action={handleComment}>
-                    <div className="flex justify-center">
-                        <input type="tex" name="comment" id="comment"  className="bg-white py-2 border-zinc-400 w-80 border-[2px] rounded-lg p-1 text-center" placeholder="Leave a comment" />
-                    </div>
-                    <div className="flex flex-col">
-                        <select name="rate" id="rate" className="text-center border-zinc-400 border-[2px] rounded-lg py-2">
-                            <option value={1}>1 ⭐</option>
-                            <option value={2}>2 ⭐</option>
-                            <option value={3}>3 ⭐</option>
-                            <option value={4}>4 ⭐</option>
-                            <option value={5}>5 🌟</option>
-                        </select>
-                    </div>
-                    <Submit />
-                </form>
+            
             </div>
-
-
+            <div className="absolute bg-white bottom-16 z-10 mb-3 flex flex-col items-center mt-4 border-zinc-400 border-[2px] rounded-xl p-4 text-center">
+                            {/* <h1 className="text-lg">Leave a comment</h1> */}
+                            <form className="flex place-content-evenly gap-3 items-center justify-center" action={handleComment}>
+                                <div className="flex justify-center">
+                                    <input type="tex" name="comment" id="comment"  className="bg-white py-2 border-zinc-400 w-80 border-[2px] rounded-lg p-1 text-center" placeholder="Leave a comment" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <select name="rate" id="rate" className="text-center border-zinc-400 border-[2px] rounded-lg py-2">
+                                        <option value={1}>1 ⭐</option>
+                                        <option value={2}>2 ⭐</option>
+                                        <option value={3}>3 ⭐</option>
+                                        <option value={4}>4 ⭐</option>
+                                        <option value={5}>5 🌟</option>
+                                    </select>
+                                </div>
+                                <Submit />
+                            </form>
+                        </div>
         </main>
     )
 }

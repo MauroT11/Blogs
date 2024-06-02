@@ -8,7 +8,7 @@ export default async function page() {
 
     const genres = (await sql`select * from genres`).rows
     const user = await currentUser();
-    // console.log(user)
+    // console.log(genres)
     
     async function handleAlbum(formData) {
         'use server'
@@ -18,8 +18,9 @@ export default async function page() {
         const artist = formData.get('artist')
         const image = formData.get('image')
         const genre = formData.get('genre')
+        const user = formData.get(user[0].username)
 
-        await sql`INSERT INTO albumRevs (title, artist, image, genre) VALUES (${title}, ${artist}, ${image}, ${genre})`
+        await sql`INSERT INTO albumRevs (title, artist, image, genre, username) VALUES (${title}, ${artist}, ${image}, ${genre}, ${user})`
 
         revalidatePath('/albums')
 

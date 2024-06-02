@@ -4,17 +4,16 @@ import { SignUp } from '@clerk/nextjs';
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center bg-gray-100">
-      <div className="w-full max-w-md mt-8">
+    <div className="flex flex-col items-center">
         <SignUp
           appearance={{
             elements: {
               rootBox:
-                'bg-white border border-gray-300 rounded-lg p-8 shadow-md',
+                'bg-white border border-gray-300 rounded-lg shadow-md',
               card: 'bg-transparent',
               headerTitle: 'text-3xl font-bold mb-4 text-accent',
-              headerSubtitle: 'text-gray-600 mb-4',
-              formFieldLabel: 'text-gray-700 mb-1',
+              headerSubtitle: 'text-gray-500 mb-4',
+              formFieldLabel: 'text-gray-600 mb-1',
               formFieldInput:
                 'border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-accent',
               footerActionText: 'text-gray-600',
@@ -27,7 +26,6 @@ export default function Page() {
           }}
           afterSignUpUrl="/"
         />
-      </div>
     </div>
   );
 }

@@ -14,10 +14,10 @@ export async function generateMetadata({params}) {
 export default async function page({params}) {
     const genres = (await sql`select * from genres where id = ${params.id}`).rows
     const name = genres[0].name
-    console.log(name)
+    // console.log(name)
     const posts = (await sql`select * from albumrevs where genre = ${name}`).rows
     
-    console.log(posts)
+    // console.log(posts)
     
 
     return (

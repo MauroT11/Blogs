@@ -2,13 +2,12 @@ import { SignIn } from '@clerk/nextjs';
 
 export default function Page() {
   return (
-    <div className="flex flex-col items-center bg-gray-100">
-      <div className="w-full max-w-md mt-8">
+    <div className="flex flex-col items-center mt-8">
         <SignIn
           appearance={{
             elements: {
               rootBox:
-                'bg-white border border-gray-300 rounded-lg p-8 shadow-md',
+                'bg-white border border-gray-300 rounded-lg shadow-md',
               card: 'bg-transparent',
               headerTitle: 'text-3xl font-bold mb-4 text-accent',
               headerSubtitle: 'text-gray-600 mb-4',
@@ -23,7 +22,6 @@ export default function Page() {
           }}
           afterSignInUrl="/"
         />
-      </div>
     </div>
   );
 }
