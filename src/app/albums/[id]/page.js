@@ -11,6 +11,7 @@ import Link from "next/link";
 import AnimateIn from "@/component/AnimateIn";
 import AnimateImg from "@/component/AnimateImg";
 import { currentUser } from "@clerk/nextjs/server";
+import Comments from "@/component/Comments"
 
 export async function generateMetadata({params}) {
     
@@ -26,10 +27,11 @@ export default async function page({params}) {
 
     const user = await currentUser();
     const username = user?.username;
+    const albumId = params.id
     
-    const post = (await sql`select * from albumrevs where id = ${params.id}`).rows
+    const post = (await sql`select * from albumrevs where id = ${albumId}`).rows
     // console.log(post[0].username)
-    const comments = (await sql`select * from comments where albumid = ${params.id}`).rows
+    const comments = (await sql`select * from comments where albumid = ${albumId}`).rows
     
 
     async function handleComment(formData) {
@@ -39,24 +41,23 @@ export default async function page({params}) {
         const rate = formData.get('rate')
         const submitDate = new Date()
 
-        const date = `${submitDate.getUTCDate()}/${(submitDate.getUTCMonth() + 1)}/${submitDate.getUTCFullYear()} ${submitDate.getUTCHours()}:${submitDate.getMinutes()}`
+        const date = `${submitDate.getUTCDate()}/${(submitDate.getUTCMonth() + 1)}/${submitDate.getUTCFullYear()}`
 
         // console.log(comment, rate, date)
 
-        await sql`INSERT INTO comments (content, rate, date, albumid, username) VALUES (${comment}, ${rate}, ${date}, ${params.id}, ${username})`
+        await sql`INSERT INTO comments (content, rate, date, albumid, username) VALUES (${comment}, ${rate}, ${date}, ${albumId}, ${username})`
 
-        revalidatePath(`/albums/${params.id}`)
+        revalidatePath(`/albums/${albumId}`)
 
-        redirect(`/albums/${params.id}`)
+        redirect(`/albums/${albumId}`)
     }
 
     async function handleDelete() {
         'use server'
 
-        await sql`delete from comments where albumid = ${params.id}`
-        await sql`delete from albumrevs where id = ${params.id}`
+        await sql`delete from comments where albumid = ${albumId}`
+        await sql`delete from albumrevs where id = ${albumId}`
         
-
         revalidatePath(`/albums/`)
 
         redirect(`/albums/`)
@@ -66,36 +67,25 @@ export default async function page({params}) {
         'use server'
         let like = post[0].likes + 1
         
-        await sql`update albumrevs set likes = ${like} where id = ${params.id}`
+        await sql`update albumrevs set likes = ${like} where id = ${albumId}`
 
-        revalidatePath(`/albums/${params.id}`)
+        revalidatePath(`/albums/${albumId}`)
 
-        redirect(`/albums/${params.id}`)
+        redirect(`/albums/${albumId}`)
     }
 
     async function handleDislike() {
         'use server'
         let dislike = post[0].dislikes + 1
 
-        await sql`update albumrevs set dislikes = ${dislike} where id = ${params.id}`
+        await sql`update albumrevs set dislikes = ${dislike} where id = ${albumId}`
 
-        revalidatePath(`/albums/${params.id}`)
+        revalidatePath(`/albums/${albumId}`)
 
-        redirect(`/albums/${params.id}`)
+        redirect(`/albums/${albumId}`)
     }
 
-    async function handleCommentDelete() {
-        'use server'
-        console.log('delete')
-        // await sql`delete from comments where albumid = ${params.id}`
-        // await sql`delete from albumrevs where id = ${params.id}`
-        
-
-        // revalidatePath(`/albums/`)
-
-        // redirect(`/albums/`)
-    }
-
+    
     return (
         <main className="flex flex-col items-center mt-8 justify-around">
             <div className="grid grid-cols-3">
@@ -114,7 +104,7 @@ export default async function page({params}) {
                             </div>
                             {(username == db.username) ? (
                                 <div className="flex gap-4">
-                                    <Link href={`/albums/${params.id}/edit`} className="bg-blue-700 text-white text-lg py-1 px-2 rounded border-black border-[2px] hover:bg-blue-500"><IoMdCreate /></Link>
+                                    <Link href={`/albums/${albumId}/edit`} className="bg-blue-700 text-white text-lg py-1 px-2 rounded border-black border-[2px] hover:bg-blue-500"><IoMdCreate /></Link>
                                     <form action={handleDelete}>
                                         <button className="bg-red-600 text-white py-1 px-2 rounded text-lg border-black border-[2px] hover:bg-red-500"><IoMdClose /></button>
                                     </form>
@@ -138,42 +128,7 @@ export default async function page({params}) {
                 </div>    
             {/* COMMENT SECTION  */}
             <div className="col-span-2 ml-72 justify-items-center">
-                <div className="flex flex-col items-center">
-                    <h1 className="text-2xl font-bold">Comments</h1>
-                    <div className="grid-rows-2 flex-col gap-2 min-w-[250px]">
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="flex flex-col gap-1 items-center min-w-48 border-zinc-400 border-[2px] rounded-xl p-2 my-1">
-                                <div className="flex flex-col items-center">
-                                    <p className="text-lg">{comment.content}</p>
-                                    <p>{comment.rate} 🌟</p>
-                                </div>
-                                <div>
-                                    <p className="text-sm">{comment.date}</p>
-                                </div>
-                                {(username == comment.username) ? (
-                                    <div className="flex gap-2">
-                                        <Link href={`/albums/${params.id}/comments/${comment.id}/edit`} className="bg-blue-700 text-md text-white py-1 px-2 rounded border-black border-[2px] hover:bg-blue-500"><IoMdCreate /></Link>
-                                        <form action={handleCommentDelete}>
-                                            <button className="bg-red-600 text-white text-md py-1 px-2 rounded border-black border-[2px] hover:bg-red-500"><IoMdClose /></button>
-                                        </form>                        
-                                    </div>
-                                ) : (
-                                    <>
-                                    <p>{comment.username}</p>
-                                    <div className="flex gap-8">
-                                        <form>
-                                            <button className="hover:bg-green-400 p-1 rounded-md text-2xl"><IoIosHeart /></button>
-                                        </form>
-                                        <form>
-                                            <button className="hover:bg-red-400 p-1 rounded-md text-2xl"><IoIosHeartDislike /></button>
-                                        </form>
-                                    </div>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <Comments comments={comments} username={username} albumId={albumId} />
             </div>
             {/* ADD COMMENT */}
   

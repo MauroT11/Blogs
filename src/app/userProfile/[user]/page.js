@@ -5,6 +5,7 @@ import { sql } from "@vercel/postgres"
 import AlbumCard from "@/component/AlbumCard"
 import Button from '@mui/material/Button';
 import { IoMdCreate } from "react-icons/io";
+import { UserProfile } from "@clerk/nextjs";
 
 export default async function Page({params}) {
 
@@ -28,6 +29,7 @@ export default async function Page({params}) {
                 <h1 className="text-4xl font-semibold">Added Albums</h1>
                 <AlbumCard albums={albums} />
             </div>    
+            <UserProfile />
         </main>
         
     )
