@@ -1,13 +1,31 @@
-'use client'
+import FilterBtn from "@/component/FilterBtn"
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
-import { useFormStatus } from "react-dom";
+export default async function Filter({genres}) {
 
-export default function Filter() {
-  const formStatus = useFormStatus();
+    async function handleFilter(formData) {
+        'use server'
 
-  return (
-    <button type="submit" disabled={formStatus.pending} className="bg-blue-700 text-white border-black border-[2px] rounded-lg p-1">
-      {formStatus.pending ? "Loading..." : "Filter"}
-    </button>
-  );
+        const genre = formData.get('genre')
+
+        revalidatePath(`/genres/${genre}`)
+
+        redirect(`/genres/${genre}`)
+    }
+
+    return (
+        <form action={handleFilter}>
+                <div className="flex gap-4 justify-center my-4 items-center">
+                        <label htmlFor="genre" className="text-2xl">Genres:</label>
+                        <select name="genre" id="genre" className="text-center border-zinc-400 border-[2px]  rounded-lg py-1">
+                            <option value={0}>Select...</option>
+                            {genres.map((genre) => (
+                                <option key={genre.id} value={genre.id}>{genre.name}</option>
+                            ))}
+                        </select>
+                        <FilterBtn />
+                </div>
+            </form>
+    )
 }

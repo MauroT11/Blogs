@@ -17,7 +17,7 @@ export default function Header({ username, userId }) {
                         <li><a href="/albums">Albums</a></li>
                     </PopHeader>
                     <PopHeader>
-                        <li><a href="/add">Add</a></li>
+                        <li><a href="/addAlbum">Add</a></li>
                     </PopHeader>
                     {userId ? (
                     <UserButton

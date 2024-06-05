@@ -2,6 +2,7 @@ import { sql } from "@vercel/postgres"
 import Submit from "@/component/Submit"
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import Link from "next/link"
 
 export async function generateMetadata({params}) {
     return {
@@ -40,6 +41,7 @@ export default async function page() {
                     <textarea rows={5} cols={30} type="text" name="desc" id="desc" className="bg-white border-zinc-400 border-[2px] rounded-lg p-1 text-center min-w-[450px] text-2xl"/>
                 </div>
                 <Submit />
+                <Link href="/addAlbum" className="bg-primary text-white text-center border-black border-[2px] rounded-lg px-2 py-1">Add Album</Link>
             </form>
         </main>
     )

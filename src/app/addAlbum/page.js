@@ -1,5 +1,6 @@
 import { sql } from "@vercel/postgres"
 import Submit from "@/component/Submit"
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { currentUser } from "@clerk/nextjs/server";
@@ -45,13 +46,14 @@ export default async function page() {
                 </div>
                 <div className="flex flex-col gap-1 items-center justify-center">
                     <label htmlFor="genre" className="text-2xl">Genre: </label>
-                    <select className="border-zinc-400 border-[2px] rounded-lg p-1 mb-4" name="genre" id="genre">
+                    <select className="border-zinc-400 border-[2px] rounded-lg p-1 mb-4 text-2xl" name="genre" id="genre">
                         {genres.map((genre) => (
                             <option key={genre.id} className="text-center">{genre.name}</option>
                         ))}
                     </select>
                 </div>
                 <Submit />
+                <Link href="/addGenre" className="bg-primary text-white text-center border-black border-[2px] rounded-lg px-2 py-1">Add Genre</Link>
             </form>
         </main>
     )
